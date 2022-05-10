@@ -20,7 +20,7 @@ namespace TimeServer
                 
                 var stream = tcpClient.GetStream();
             
-                stream.Write(Encoding.ASCII.GetBytes("The current time is: " + DateTime.Now));
+                stream.Write(Encoding.ASCII.GetBytes("The date and time is: " + DateTime.Now));
                 stream.Close();
             }
         }

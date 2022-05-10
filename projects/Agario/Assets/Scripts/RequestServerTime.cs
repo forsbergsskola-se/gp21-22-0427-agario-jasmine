@@ -1,9 +1,12 @@
+using System;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class RequestServerTime : MonoBehaviour
-{
+public class RequestServerTime : MonoBehaviour {
+    [SerializeField] Text dateAndTimeText;
+
     public void SendRequest() {
         TcpClient tcpClient = new TcpClient("127.0.0.1", 44);
 
@@ -12,8 +15,12 @@ public class RequestServerTime : MonoBehaviour
         byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
         stream.Read(bytes, 0, bytes.Length);
         
-        string info = Encoding.ASCII.GetString(bytes);
+        string message = Encoding.ASCII.GetString(bytes);
 
-        //TODO: Output to text in Unity
+        UpdateText(message);
+    }
+
+    private void UpdateText(string message) {
+        dateAndTimeText.text = message;
     }
 }
