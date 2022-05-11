@@ -5,17 +5,22 @@ using System.Text;
 
 public static class Program {
     static void Main(string[] arguments) {
-        var serverEndpoint = new IPEndPoint(IPAddress.Loopback, 14411);
-		
-        // We open the Socket, so we can receive Packets
+        string wordSequence = "";
+
+        // TODO: Setup server
+        // TODO: Connect to server & confirm
+        // TODO: Send word to server
+        // TODO: Validate word or send error message back
+        // TODO: Store words in meaning
+        // TODO: Send back meaning
+        // TODO: Allow another word
+
+        var serverEndpoint = new IPEndPoint(IPAddress.Loopback, 2222);
         var server = new UdpClient(serverEndpoint);
+        
         while (true) {
-            // This struct will contain the info of the sender
-            // After calling Receive
             IPEndPoint clientEndpoint = default;
-            // Here, we receive a message from some client
-            // A ref parameter means, that this function
-            // can change the struct from within the function
+            
             var response = server.Receive(ref clientEndpoint);
             Console.WriteLine($"Packet received from: {clientEndpoint} saying: {Encoding.ASCII.GetString(response)}");
         }
