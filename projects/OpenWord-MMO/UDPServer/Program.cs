@@ -12,9 +12,8 @@ public static class Program {
 
         while (true) {
             var server = new UdpClient(serverEndpoint);
-
-            IPEndPoint? clientEndpoint = default;
             
+            IPEndPoint? clientEndpoint = default;
             var response = server.Receive(ref clientEndpoint);
             string responseString = Encoding.ASCII.GetString(response).Trim();
 
@@ -31,7 +30,6 @@ public static class Program {
             
             byte[] returnBytes = Encoding.ASCII.GetBytes(wordSequence);
             server.Send(returnBytes, returnBytes.Length, clientEndpoint);
-
             server.Close();
         }
     }
