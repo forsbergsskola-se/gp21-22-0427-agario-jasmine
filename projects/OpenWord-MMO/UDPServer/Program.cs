@@ -14,11 +14,16 @@ public static class Program {
         // TODO: Send back meaning
         // TODO: Allow another word
 
-        var serverEndpoint = new IPEndPoint(IPAddress.Loopback, 2222);
-        var server = new UdpClient(serverEndpoint);
         
+        string wordSequence = "Word sequence is: ";
+        byte[] returnBytes;
+        
+        var serverEndpoint = new IPEndPoint(IPAddress.Loopback, 2222);
+
         while (true) {
-            IPEndPoint clientEndpoint = default;
+            var server = new UdpClient(serverEndpoint);
+
+            IPEndPoint? clientEndpoint = default;
             
             var response = server.Receive(ref clientEndpoint);
             string responseString = Encoding.ASCII.GetString(response);
@@ -31,10 +36,13 @@ public static class Program {
                 responseString = Encoding.ASCII.GetString(response);
             }
             
+            Console.WriteLine($"Packet received from: {clientEndpoint} saying: {responseString}");
+            wordSequence += " " + responseString;
             
+            returnBytes = Encoding.ASCII.GetBytes(wordSequence);
+            server.Send(returnBytes, returnBytes.Length, clientEndpoint);
 
-
-            Console.WriteLine($"Packet received from: {clientEndpoint} saying: {Encoding.ASCII.GetString(response)}");
+            server.Close();
         }
     }
 }
