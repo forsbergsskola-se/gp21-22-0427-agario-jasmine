@@ -8,7 +8,6 @@ namespace TimeServer
     class Program
     {
         static void Main(string[] args) {
-            
             TcpListener tcpListener = new TcpListener(IPAddress.Any, 44);
             tcpListener.Start();
             
@@ -18,10 +17,9 @@ namespace TimeServer
                 var tcpClient = tcpListener.AcceptTcpClient();
                 Console.WriteLine($"Client {tcpClient.Client.RemoteEndPoint} connected.");
                 
-                var stream = tcpClient.GetStream();
+                using var stream = tcpClient.GetStream();
             
                 stream.Write(Encoding.ASCII.GetBytes("The date and time is: " + DateTime.Now));
-                stream.Close();
             }
         }
     }
