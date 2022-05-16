@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -25,14 +26,44 @@ public class OpenWordClient : MonoBehaviour {
 
     public void SendWord() {
         byte[] bytes = Encoding.ASCII.GetBytes(_inputField.text);
-        Debug.Log(_inputField.text);
         _client.Send(bytes, bytes.Length, _serverEndPoint);
         ReceiveResponse();
     }
 
     public void ReceiveResponse() {
-        var wordResponse = _client.Receive(ref _serverEndPoint);
-        Debug.Log("Server response was: " + Encoding.ASCII.GetString(wordResponse));
+        var messageBytes = _client.Receive(ref _serverEndPoint);
+        NetworkMessage message = UnpackJson(messageBytes);
+        Debug.Log("msg: " + message.Response);
+
+        //Check for error
+        //Set error text
+        
+        //Display word sentence
     }
 
+    private NetworkMessage UnpackJson(byte[] messageBytes) {
+        string messageJson = Encoding.ASCII.GetString(messageBytes);
+        Debug.Log(messageJson);
+        return JsonUtility.FromJson<NetworkMessage>(messageJson);
+    }
+
+}
+
+[Serializable]
+public class NetworkMessage {
+    public string Response = "";
+    public Result Result;
+}
+    
+[Serializable]
+public class Result {
+    public Error Error;
+    public string ErrorMessage = "";
+}
+    
+public enum Error {
+    None,
+    TooLong,
+    ContainsWhitespace,
+    TooLongAndContainsWhitespace
 }
