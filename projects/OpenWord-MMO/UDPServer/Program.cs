@@ -2,38 +2,39 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using UDPServer;
 
 public static class Program {
     static void Main(string[] arguments) {
-        string wordSequence = "Word sequence is: ";
-        const string errorMessage = "Error: Word is longer than 20 characters or contain whitespaces, please try again!";
-        var errorBytes = Encoding.ASCII.GetBytes(errorMessage);
-
         var serverEndpoint = new IPEndPoint(IPAddress.Loopback, 2222);
         var server = new UdpClient(serverEndpoint);
+        
+        NetworkMessage networkMessage = new NetworkMessage();
         
         while (true) {
             IPEndPoint? clientEndpoint = default;
             var response = server.Receive(ref clientEndpoint);
             string responseString = Encoding.ASCII.GetString(response).Trim();
 
-            if (!WordIsValid(responseString)) {
-                server.Send(errorBytes, errorBytes.Length, clientEndpoint);           
+            networkMessage.Result = WordValidator.ProcessWord(responseString);
+            if (networkMessage.Result.Error != Error.None) {
+                SendNetworkMessage(networkMessage, server, clientEndpoint);
                 continue;
             }
-            
+
             Console.WriteLine($"Packet received from: {clientEndpoint} saying: {responseString}");
-            wordSequence += " " + responseString;
             
-            byte[] returnBytes = Encoding.ASCII.GetBytes(wordSequence);
-            server.Send(returnBytes, returnBytes.Length, clientEndpoint);
+            networkMessage.Response += " " + responseString;
+            SendNetworkMessage(networkMessage, server, clientEndpoint);
         }
     }
 
-    private static bool WordIsValid(string word) {
-        //Regex expression for only allowing words without whitespaces and 20 or less characters.
-        Regex regex = new Regex(@"^\S{0,20}$");
-        return regex.IsMatch(word);
+    private static void SendNetworkMessage(NetworkMessage networkMessage, UdpClient? server, IPEndPoint? clientEndpoint) {
+        string messageJson = JsonSerializer.Serialize(networkMessage);
+        Console.WriteLine(messageJson);
+        byte[] messageBytes = Encoding.ASCII.GetBytes(messageJson);
+        server?.Send(messageBytes, messageBytes.Length, clientEndpoint);
     }
 }
