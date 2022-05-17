@@ -2,34 +2,32 @@ using System;
 using System.Text.RegularExpressions;
 
 namespace UDPServer {
-    [Serializable]
-    public class NetworkMessage {
-        public string Response { get; set; } = "";
-        public Result Result { get; set; }
-    }
-    
-    [Serializable]
-    public class Result {
-        public Error Error { get; set; }
-        public string ErrorMessage { get; set; } = "";
-    }
-    
     public enum Error {
         None,
         TooLong,
         ContainsWhitespace,
         TooLongAndContainsWhitespace
     }
-    
+
     public static class WordValidator {
         public static Result ProcessWord(string word) {
-            Regex lengthPattern = new Regex(@"^.{0,20}$");
-            Regex charPattern = new Regex(@"\A\S{0,}\z");
-            
+            Result result = ValidateWord(word);
+            SetErrorMessage(result);
+
+            return result;
+        }
+
+        private static Result ValidateWord(string word) {
             Result result = new Result {
                 Error = Error.None,
                 ErrorMessage = ""
             };
+            
+            //Regex pattern allowing 0-20 characters
+            Regex lengthPattern = new Regex(@"^.{0,20}$");
+            
+            //Regex pattern not allowing whitespaces
+            Regex charPattern = new Regex(@"\A\S{0,}\z");
 
             if (!lengthPattern.IsMatch(word) && !charPattern.IsMatch(word)) {
                 result.Error = Error.TooLongAndContainsWhitespace;
@@ -38,7 +36,11 @@ namespace UDPServer {
             } else if (!charPattern.IsMatch(word)) {
                 result.Error = Error.ContainsWhitespace;
             }
-            
+
+            return result;
+        }
+        
+        private static void SetErrorMessage(Result result) {
             switch (result.Error) {
                 case Error.None:
                     break;
@@ -54,8 +56,6 @@ namespace UDPServer {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            return result;
         }
     }
 }
