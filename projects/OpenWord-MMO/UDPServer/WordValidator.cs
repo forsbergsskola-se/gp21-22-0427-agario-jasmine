@@ -23,8 +23,8 @@ namespace UDPServer {
                 ErrorMessage = ""
             };
             
-            //Regex pattern allowing 0-20 characters
-            Regex lengthPattern = new Regex(@"^.{0,20}$");
+            //Regex pattern allowing 1-20 characters
+            Regex lengthPattern = new Regex(@"^.{1,20}$");
             
             //Regex pattern not allowing whitespaces
             Regex charPattern = new Regex(@"\A\S{0,}\z");
@@ -45,7 +45,7 @@ namespace UDPServer {
                 case Error.None:
                     break;
                 case Error.TooLong:
-                    result.ErrorMessage = "Error: The word is longer than 20 characters, please try again!";
+                    result.ErrorMessage = "Error: The word must contain between 1-20 characters, please try again!";
                     break;
                 case Error.ContainsWhitespace:
                     result.ErrorMessage = "Error: The word contains white spaces, please try again!";
