@@ -22,6 +22,7 @@ public class UIHandler : MonoBehaviour {
     }
 
     public void HideDescription() {
+        //TODO: hides before showned
         uxHelpText.text = "";
     }
 
