@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class OpenWordClient : MonoBehaviour {
@@ -30,14 +31,17 @@ public class OpenWordClient : MonoBehaviour {
         ReceiveResponse();
     }
 
+    public delegate void ErrorMessageReceived(string errorMessage);
+    public static event ErrorMessageReceived OnErrorMessageReceived;
+
     public void ReceiveResponse() {
         var messageBytes = _client.Receive(ref _serverEndPoint);
         NetworkMessage message = UnpackJson(messageBytes);
-        Debug.Log("msg: " + message.Response);
 
-        //Check for error
-        //Set error text
-        
+        if (message.Result.Error != Error.None) {
+            OnErrorMessageReceived?.Invoke(message.Result.ErrorMessage);
+        } //Else invoke on message recieved
+
         //Display word sentence
     }
 
@@ -49,6 +53,7 @@ public class OpenWordClient : MonoBehaviour {
 
 }
 
+//Move to other script
 [Serializable]
 public class NetworkMessage {
     public string Response = "";
